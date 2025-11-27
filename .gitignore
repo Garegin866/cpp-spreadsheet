@@ -1,0 +1,45 @@
+# Build directories
+/build/
+/cmake-build-*/
+/CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Ninja
+/.ninja_deps
+/.ninja_log
+build.ninja
+
+# Compiled objects
+*.o
+*.obj
+*.lo
+*.la
+*.a
+*.lib
+*.so
+*.so.*
+*.dll
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+/spreadsheet
+
+# CLion / JetBrains
+.idea/
+/.vscode/
+
+# Logs
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# ANTLR / generated stuff in build
+antlr4cpp_generated_src/
+
