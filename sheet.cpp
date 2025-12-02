@@ -4,42 +4,28 @@
 #include "common.h"
 
 #include <algorithm>
-#include <iostream>
-#include <optional>
 #include <sstream>
-#include <utility>
-
-using namespace std::literals;
+#include <unordered_set>
 
 namespace {
-
-    void CheckPositionValid(Position pos) {
-        if (!pos.IsValid()) {
+    inline void CheckPositionValid(Position pos) {
+        if (!pos.IsValid())
             throw InvalidPositionException("Invalid position");
-        }
     }
-
-} // namespace
+}
 
 void Sheet::SetCell(Position pos, std::string text) {
     CheckPositionValid(pos);
 
-    if (text.empty()) {
-        ClearCell(pos);
+    Cell* cell = GetOrCreateCell(pos);
+    if (cell->GetText() == text) {
         return;
     }
 
-    auto it = cells_.find(pos);
-    if (it == cells_.end()) {
-        auto new_cell = std::make_unique<Cell>();
-        new_cell->Set(std::move(text));
-        cells_.emplace(pos, std::move(new_cell));
-    } else {
-        it->second->Set(std::move(text));
-    }
+    cell->Set(std::move(text));
 }
 
-const CellInterface* Sheet::GetCell(Position pos) const {
+[[nodiscard]] const CellInterface* Sheet::GetCell(Position pos) const {
     CheckPositionValid(pos);
 
     auto it = cells_.find(pos);
@@ -61,10 +47,22 @@ CellInterface* Sheet::GetCell(Position pos) {
 
 void Sheet::ClearCell(Position pos) {
     CheckPositionValid(pos);
-    cells_.erase(pos);
+
+    auto it = cells_.find(pos);
+    if (it == cells_.end()) {
+        return;
+    }
+
+    Cell* cell = it->second.get();
+
+    cell->Clear();
+
+    if (!cell->IsReferenced()) {
+        cells_.erase(it);
+    }
 }
 
-Size Sheet::GetPrintableSize() const {
+[[nodiscard]] Size Sheet::GetPrintableSize() const {
     if (cells_.empty()) {
         return {0, 0};
     }
@@ -145,6 +143,20 @@ void Sheet::PrintTexts(std::ostream& output) const {
         }
         output << '\n';
     }
+}
+
+Cell *Sheet::GetOrCreateCell(Position pos) {
+    CheckPositionValid(pos);
+
+    auto it = cells_.find(pos);
+    if (it != cells_.end()) {
+        return it->second.get();
+    }
+
+    auto cell = std::make_unique<Cell>(*this);
+    Cell* raw = cell.get();
+    cells_.emplace(pos, std::move(cell));
+    return raw;
 }
 
 std::unique_ptr<SheetInterface> CreateSheet() {

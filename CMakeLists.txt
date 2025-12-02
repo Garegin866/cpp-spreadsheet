@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+
+if (NOT DEFINED CMAKE_POLICY_VERSION_MINIMUM)
+    set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+endif ()
+
 project(spreadsheet)
 
 set(CMAKE_CXX_STANDARD 17)
