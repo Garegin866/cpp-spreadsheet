@@ -122,13 +122,13 @@ void Sheet::PrintValues(std::ostream& output) const {
 
 void Sheet::PrintTexts(std::ostream& output) const {
     Size size = GetPrintableSize();
-    for (int r = 0; r < size.rows; ++r) {
-        for (int c = 0; c < size.cols; ++c) {
-            if (c > 0) {
+    for (int row = 0; row < size.rows; ++row) {
+        for (int col = 0; col < size.cols; ++col) {
+            if (col > 0) {
                 output << '\t';
             }
 
-            Position pos{r, c};
+            Position pos{row, col};
             auto it = cells_.find(pos);
             if (it == cells_.end() || !it->second) {
                 continue;

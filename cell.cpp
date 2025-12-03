@@ -89,6 +89,10 @@ std::string Cell::GetText() const {
 }
 
 void Cell::Set(std::string text) {
+    if (text == GetText()) {
+        return;
+    }
+
     std::unique_ptr<Impl> new_impl;
 
     if (text.empty()) {
@@ -113,16 +117,7 @@ void Cell::Set(std::string text) {
 }
 
 void Cell::Clear() {
-    for (Cell* ref : referenced_) {
-        if (ref) {
-            ref->dependents_.erase(this);
-        }
-    }
-    referenced_.clear();
-
-    InvalidateCache();
-
-    impl_ = std::make_unique<EmptyImpl>();
+    Set("");
 }
 
 std::vector<Position> Cell::GetReferencedCells() const {
